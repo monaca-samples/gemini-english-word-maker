@@ -1,0 +1,18 @@
+{
+  "cwd": "/Users/asial/projects/monacaTemplates/monaca-templates-script/framework7-v8-core-blank",
+  "type": [
+    "web"
+  ],
+  "name": "framework7-v8-core-blank",
+  "framework": "core",
+  "template": "blank",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}

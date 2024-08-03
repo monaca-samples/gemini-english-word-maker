@@ -1,0 +1,96 @@
+<template>
+    <div class="page">
+        <!-- ナビゲーションバー -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="title">Gemini単語生成</div>
+            </div>
+        </div>
+        <!-- ページコンテンツ -->
+        <div class="page-content">
+            <!-- 入力フォーム -->
+            <form class="list list-strong-ios list-dividers-ios list-outline-ios">
+                <ul>
+                    <li>
+                        <div class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">単語</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="word" placeholder="英単語を入力してください" value="" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <!-- 生成ボタン -->
+                <div class="block block-strong grid grid-gap">
+                    <a class="button button-fill convert-form-to-data" href="#" @click=${send}>単語データ生成</a>
+                </div>
+            </form>
+            <!-- 結果表示テーブル -->
+            <div class="data-table">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th nowrap>日本語名</th>
+                            <td>${data.japanese}</td>
+                        </tr>
+                        <tr>
+                            <th>品詞</th>
+                            <td>${data.parts}</td>
+                        </tr>
+                        <tr>
+                            <th>定義</th>
+                            <td>${data.definition}</td>
+                        </tr>
+                        <tr>
+                            <th>例文</th>
+                            <td>${data.example}</td>
+                        </tr>
+                        <tr>
+                            <th>関連語</th>
+                            <td>${(data.references || []).join(', ')}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    export default function (props, { $f7, $on, $update, $onMounted }) {
+        // データオブジェクトの初期化
+        let data = {};
+
+        // 単語データ生成関数
+        const send = async (e) => {
+            // 入力された単語を取得
+            const word = document.querySelector('[name="word"]').value;
+            if (word === '') return;  // 単語が空の場合は処理を中止
+            console.log({ word });
+
+            // Geminiモデルに送信するプロンプトを作成
+            const prompt = `${word}について、下記の情報をJSONで返してください
+        - 日本語名（日本語）: japaneseというキー
+        - 定義（英語）: definition というキー
+        - 品詞（日本語）: parts というキー
+        - 例文（英語）: example というキー
+        - 関連語（英語）: references というキーで、配列にて
+        `;
+
+            const res = await geminiModel.generateContent([prompt]);
+            try {
+                data = JSON.parse(res.response.candidates[0].content.parts[0].text);
+                $update();  // UIを更新
+            } catch (e) {
+                // パースに失敗した場合、dataを空オブジェクトにリセット
+                data = {};
+            }
+            $update();  // UIを再度更新
+        };
+
+        return $render;
+    }
+</script>
